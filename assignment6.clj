@@ -14,8 +14,16 @@
 (with-test
   (defn serialize ^String [^::ExcrC ex]
     "serialize an ExcrC"
-    "hello")
+    (cond
+      (instance? NumC ex) (str (:n ex))
+      (instance? TrueC ex) "true"
+      (instance? FalseC ex) "false"
+      :else (throw (new Exception "serialize requires an ExcrC"))))
   (is (= "true" (serialize (new TrueC))))
-  (is (= "false" (serialize (new FalseC)))))
+  (is (= "false" (serialize (new FalseC))))
+  (is (= "4" (serialize (new NumC 4))))
+  (is (= "-12" (serialize (new NumC -12))))
+  (is (thrown-with-msg? Exception #"serialize requires an ExcrC"
+      (serialize "asdf"))))
 
-(run-all-tests)
+(run-tests)
