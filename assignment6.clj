@@ -1,14 +1,30 @@
 (use 'clojure.test)
 
+; Creates a java interface called ExprC
 (defprotocol ExcrC
   (foo [this]))
 
+; Classes that implement ExprC
 (defrecord NumC [^Integer n]
   ExcrC)
 (defrecord TrueC []
   ExcrC)
 (defrecord FalseC []
   ExcrC)
+
+; Creates a java interface called Value
+(defprotocol Value
+  (foo [this]))
+
+; Classes that implement Value
+(defrecord NumV [^int n]
+  Value)
+(defrecord BoolV [^boolean b]
+  Value)
+
+(deftest testValue
+  (is (= (new NumV 4) (new NumV 4)))
+  (is (not (= (new NumV 4) (new NumV 6)))))
 
 (def n (new NumC 4))
 (println (instance? NumC n))
