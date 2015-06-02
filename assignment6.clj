@@ -5,7 +5,7 @@
   (foo [this]))
 
 ; Classes that implement ExprC
-(defrecord NumC [^Integer n]
+(defrecord NumC [^int n]
   ExcrC)
 (defrecord TrueC []
   ExcrC)
@@ -13,8 +13,9 @@
   ExcrC)
 (defrecord BinopC [^String op ^::ExcrC a ^::ExcrC b]
   ExcrC)
-
-(defrecord IfC [^::ExcrC check ^::ExcrC then ^::ExcrC otherwise]
+(defrecord IfC [^::ExcrC check
+                ^::ExcrC then
+                ^::ExcrC otherwise]
   ExcrC)
 
 ; Creates a java interface called Value
@@ -27,8 +28,7 @@
 (defrecord BoolV [^boolean b]
   Value)
 
-
-
+;;;;;;;;;;;;; INTERP & HELPERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn interp ^::Value [^::ExcrC ex]
   (cond
     (instance? NumC ex) (new NumV (:n ex))
@@ -54,8 +54,6 @@
 (def n (new NumC 4))
 (println (instance? NumC n))
 
-;(deftest testIf
-;  (is (= (new IfC (new TrueC) (new numC 4) (new numC 5))) (new numC 4)))
 
 (deftest testValue
   (is (= (new NumV 4) (new NumV 4)))
@@ -73,6 +71,7 @@
   (is (= (new NumV 4) (interp (new NumC 4))))
   (is (= (new BoolV true) (interp (new TrueC))))
   (is (= (new BoolV false) (interp (new FalseC))))
+  (is (= (new IfC (new TrueC) (new NumC 4) (new NumC 5))) (new NumC 4))
   (is (= (new NumV 7) (interp (new BinopC "+" (new NumV 3) (new NumV 4)))))
   (is (= (new NumV 12) (interp (new BinopC "*" (new NumV 3) (new NumV 4)))))
   (is (= (new NumV 3/4) (interp (new BinopC "/" (new NumV 3) (new NumV 4))))))
