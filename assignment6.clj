@@ -12,6 +12,9 @@
 (defrecord FalseC []
   ExcrC)
 
+(defrecord IfC [^::ExcrC check ^::ExcrC then ^::ExcrC otherwise]
+  ExcrC)
+
 ; Creates a java interface called Value
 (defprotocol Value
   (foo [this]))
@@ -22,9 +25,15 @@
 (defrecord BoolV [^boolean b]
   Value)
 
+
+
 (defn interp ^::Value [^::ExcrC ex]
   (cond
-    (instance? NumC ex) (new NumV (:n ex))))
+    (instance? NumC ex) (new NumV (:n ex))
+    (instance? TrueC ex) (new BoolV true)
+    (instance? FalseC ex) (new BoolV false)
+    ;(instance? IfC ex) (ne)
+    ))
 
 (defn serialize ^String [^::ExcrC ex]
   "serialize an ExcrC"
@@ -39,6 +48,9 @@
 (def n (new NumC 4))
 (println (instance? NumC n))
 
+;(deftest testIf
+;  (is (= (new IfC (new TrueC) (new numC 4) (new numC 5))) (new numC 4)))
+
 (deftest testValue
   (is (= (new NumV 4) (new NumV 4)))
   (is (not (= (new NumV 4) (new NumV 6)))))
@@ -52,6 +64,8 @@
       (serialize "asdf"))))
 
 (deftest testInterp
-  (is (= (new NumV 4) (interp (new NumC 4)))))
+  (is (= (new NumV 4) (interp (new NumC 4))))
+  (is (= (new BoolV true) (interp (new TrueC))))
+  (is (= (new BoolV false) (interp (new FalseC)))))
 
 (run-tests)
