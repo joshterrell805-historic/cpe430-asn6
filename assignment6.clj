@@ -22,12 +22,9 @@
 (defrecord BoolV [^boolean b]
   Value)
 
-(deftest testValue
-  (is (= (new NumV 4) (new NumV 4)))
-  (is (not (= (new NumV 4) (new NumV 6)))))
-
-(def n (new NumC 4))
-(println (instance? NumC n))
+(defn interp ^::Value [^::ExcrC ex]
+  (cond
+    (instance? NumC ex) (new NumV (:n ex))))
 
 (defn serialize ^String [^::ExcrC ex]
   "serialize an ExcrC"
@@ -37,6 +34,15 @@
     (instance? FalseC ex) "false"
     :else (throw (new Exception "serialize requires an ExcrC"))))
 
+;;;;;;;;;;;;; TESTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def n (new NumC 4))
+(println (instance? NumC n))
+
+(deftest testValue
+  (is (= (new NumV 4) (new NumV 4)))
+  (is (not (= (new NumV 4) (new NumV 6)))))
+
 (deftest testSerialize
   (is (= "true" (serialize (new TrueC))))
   (is (= "false" (serialize (new FalseC))))
@@ -45,5 +51,7 @@
   (is (thrown-with-msg? Exception #"serialize requires an ExcrC"
       (serialize "asdf"))))
 
+(deftest testInterp
+  (is (= (new NumV 4) (interp (new NumC 4)))))
 
 (run-tests)
