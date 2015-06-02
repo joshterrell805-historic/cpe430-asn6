@@ -11,6 +11,8 @@
   ExcrC)
 (defrecord FalseC []
   ExcrC)
+(defrecord BinopC [^String op ^::ExcrC a ^::ExcrC b]
+  ExcrC)
 
 (defrecord IfC [^::ExcrC check ^::ExcrC then ^::ExcrC otherwise]
   ExcrC)
@@ -32,8 +34,12 @@
     (instance? NumC ex) (new NumV (:n ex))
     (instance? TrueC ex) (new BoolV true)
     (instance? FalseC ex) (new BoolV false)
-    ;(instance? IfC ex) (ne)
-    ))
+    (instance? BinopC ex)
+      (case (:op ex)
+        "+" (new NumV (+ (:n (:a ex)) (:n (:b ex))))
+        "-" (new NumV (- (:n (:a ex)) (:n (:b ex))))
+        "/" (new NumV (/ (:n (:a ex)) (:n (:b ex))))
+        "*" (new NumV (* (:n (:a ex)) (:n (:b ex)))))))
 
 (defn serialize ^String [^::ExcrC ex]
   "serialize an ExcrC"
@@ -66,6 +72,9 @@
 (deftest testInterp
   (is (= (new NumV 4) (interp (new NumC 4))))
   (is (= (new BoolV true) (interp (new TrueC))))
-  (is (= (new BoolV false) (interp (new FalseC)))))
+  (is (= (new BoolV false) (interp (new FalseC))))
+  (is (= (new NumV 7) (interp (new BinopC "+" (new NumV 3) (new NumV 4)))))
+  (is (= (new NumV 12) (interp (new BinopC "*" (new NumV 3) (new NumV 4)))))
+  (is (= (new NumV 3/4) (interp (new BinopC "/" (new NumV 3) (new NumV 4))))))
 
 (run-tests)
