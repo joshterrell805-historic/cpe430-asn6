@@ -1,7 +1,9 @@
 (use 'clojure.test)
 
-(defprotocol ExcrC)
-(defrecord NumC [^int n]
+(defprotocol ExcrC
+  (foo [this]))
+  
+(defrecord NumC [^Integer n]
   ExcrC)
 (defrecord TrueC []
   ExcrC)
