@@ -34,6 +34,11 @@
     (instance? NumC ex) (new NumV (:n ex))
     (instance? TrueC ex) (new BoolV true)
     (instance? FalseC ex) (new BoolV false)
+    (instance? IfC ex)
+      (let [res (interp (:check ex))]
+        (cond
+          (instance? BoolV res) (interp (:then ex))
+          :else (throw (new Exception "must test boolean expression"))))
     (instance? BinopC ex)
       (case (:op ex)
         "+" (new NumV (+ (:n (:a ex)) (:n (:b ex))))
@@ -51,9 +56,8 @@
 
 ;;;;;;;;;;;;; TESTS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def n (new NumC 4))
-(println (instance? NumC n))
-
+;(def n (new NumC 4))
+;(println (instance? NumC n))
 
 (deftest testValue
   (is (= (new NumV 4) (new NumV 4)))
@@ -71,7 +75,7 @@
   (is (= (new NumV 4) (interp (new NumC 4))))
   (is (= (new BoolV true) (interp (new TrueC))))
   (is (= (new BoolV false) (interp (new FalseC))))
-  (is (= (new IfC (new TrueC) (new NumC 4) (new NumC 5))) (new NumC 4))
+  (is (= (new NumV 4) (interp (new IfC (new TrueC) (new NumC 4) (new NumC 5)))))
   (is (= (new NumV 7) (interp (new BinopC "+" (new NumV 3) (new NumV 4)))))
   (is (= (new NumV 12) (interp (new BinopC "*" (new NumV 3) (new NumV 4)))))
   (is (= (new NumV 3/4) (interp (new BinopC "/" (new NumV 3) (new NumV 4))))))
